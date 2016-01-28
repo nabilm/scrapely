@@ -75,13 +75,13 @@ class TemplateMaker(object):
                     anlist.append((an, i))
         return anlist
 
-    def annotate_fragment(self, index, field):
+    def annotate_fragment(self, index, field, weight=1):
         for f in self.htmlpage.parsed_body[index::-1]:
             if isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.OPEN_TAG:
                 if 'data-scrapy-annotate' in f.attributes:
                     fstr = self.htmlpage.fragment_data(f)
                     raise FragmentAlreadyAnnotated("Fragment already annotated: %s" % fstr)
-                d = {'annotations': {'content': field}}
+                d = {'annotations': {'content': field, 'weight': weight}}
                 a = ' data-scrapy-annotate="%s"' % json.dumps(d).replace('"', '&quot;')
                 p = self.htmlpage
                 p.body = p.body[:f.end-1] + a + p.body[f.end-1:]
