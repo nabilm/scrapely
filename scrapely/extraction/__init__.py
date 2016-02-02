@@ -110,6 +110,7 @@ class InstanceBasedLearningExtractor(object):
         used first.
         """
         max_extracted_value = {}
+        max_weight = 0
         correctly_extracted_template = ''
         extraction_page = parse_extraction_page(self.token_dict, html)
         if pref_template_id is not None:
@@ -121,7 +122,20 @@ class InstanceBasedLearningExtractor(object):
         for extraction_tree in extraction_trees:
             extracted = extraction_tree.extract(extraction_page)
             correctly_extracted = self.validated[extraction_tree.template.id](extracted)
-            if len(correctly_extracted[0]) > len(max_extracted_value):
+            weight = 0.0
+            # Getting all annotations weights in the template.
+            annotations_weights = {}
+            for annotation in extraction_tree.template.annotations:
+                for tag_attribute in annotation.tag_attributes:
+                    if tag_attribute[0] == 'weight':
+                        annotations_weights[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
+                        break
+            # Sum the weights of extracted values.
+            for key, value in correctly_extracted[0].items():
+                weight += annotations_weights.get(key, 1.0)
+
+            if weight > max_weight:
+                max_weight = weight
                 max_extracted_value = correctly_extracted[0]
                 correctly_extracted_template = extraction_tree.template
 

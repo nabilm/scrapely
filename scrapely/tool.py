@@ -75,7 +75,7 @@ class IblTool(cmd.Cmd):
         if criteria.field:
             for index in selection:
                 index = selection[0]
-                tm.annotate_fragment(index, criteria.field)
+                tm.annotate_fragment(index, criteria.field, criteria.weight or 1)
                 self._save_template(template_id, tm.get_template())
                 print("[new] (%s) %r" % (criteria.field,
                     remove_annotation(tm.selected_data(index))))
@@ -153,6 +153,7 @@ class IblTool(cmd.Cmd):
         p = optparse.OptionParser()
         p.add_option('-f', '--field', help='field to annotate')
         p.add_option('-n', '--number', type="int", help='number of result to select')
+        p.add_option('-w', '--weight', type="int", help='weight of annotation in case of multiple result')
         o, a = p.parse_args(shlex.split(criteria_str))
         o.text = ' '.join(a)
         if isinstance(o.text, bytes):
