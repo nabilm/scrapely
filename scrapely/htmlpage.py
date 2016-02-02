@@ -28,6 +28,7 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
     unspecified, the encoding is guessed using `w3lib.encoding.html_to_unicode`.
     `default_encoding` is used if the encoding cannot be determined.
     """
+    # TODO : encoding argument is deprecated we should remote it in the future
     try:
         url_request = requests.get(url)
     except Exception, ex:
@@ -35,8 +36,6 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
     body = url_request.text
     headers = url_request.headers
     encoding = url_request.encoding
-    if encoding:
-        body = body.decode(encoding)
     return HtmlPage(url_request.url, headers=dict(headers), body=body, encoding=encoding)
 
 
