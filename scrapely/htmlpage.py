@@ -81,6 +81,7 @@ class HtmlPage(object):
     core extraction code, but it may be used by some extractors to translate
     entities or encoding urls.
     """
+
     def __init__(self, url=None, headers=None, body=None, page_id=None, encoding='utf-8'):
         assert isinstance(body, six.text_type), "unicode expected, got: %s" % type(body).__name__
         self.headers = headers or {}
@@ -113,15 +114,18 @@ class TextPage(HtmlPage):
     """An HtmlPage with one unique HtmlDataFragment, needed to have a
     convenient text with same interface as html page but avoiding unnecesary
     reparsing"""
+
     def _set_body(self, text):
         self._body = text
         self.parsed_body = [HtmlDataFragment(0, len(self._body), True)]
+
     body = property(lambda x: x._body, _set_body, doc="raw text for the page")
 
 
 class HtmlPageRegion(six.text_type):
     """A Region of an HtmlPage that has been extracted
     """
+
     def __new__(cls, htmlpage, data):
         return six.text_type.__new__(cls, data)
 
@@ -143,6 +147,7 @@ class HtmlPageParsedRegion(HtmlPageRegion):
     This has a parsed_fragments property that contains the parsed html
     fragments contained within this region
     """
+
     def __new__(cls, htmlpage, start_index, end_index):
         text = htmlpage.body
         if text:
@@ -176,10 +181,10 @@ class HtmlPageParsedRegion(HtmlPageRegion):
     def text_content(self):
         """Text content of this parsed region"""
         text_all = u" ".join(self.htmlpage.body[_element.start:_element.end] \
-                for _element in self.parsed_fragments if \
-                not isinstance(_element, HtmlTag) and _element.is_text_content)
+                             for _element in self.parsed_fragments if \
+                             not isinstance(_element, HtmlTag) and _element.is_text_content)
         return TextPage(self.htmlpage.url, self.htmlpage.headers, \
-                text_all, encoding=self.htmlpage.encoding).subregion()
+                        text_all, encoding=self.htmlpage.encoding).subregion()
 
 
 class HtmlTagType(object):
@@ -213,8 +218,11 @@ class HtmlTag(HtmlDataFragment):
         self.attributes = attributes
 
     def __str__(self):
-        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted\
-                (["%s: %s" % (k, repr(v)) for k, v in self.attributes.items()])), self.tag_type, self.start, self.end)
+        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted \
+                                                                                                 (["%s: %s" % (
+                                                                                                 k, repr(v)) for k, v in
+                                                                                                   self.attributes.items()])),
+                                                                         self.tag_type, self.start, self.end)
 
     def __repr__(self):
         return str(self)
@@ -249,12 +257,12 @@ def parse_html(text):
         if start > prev_end:
             yield HtmlDataFragment(prev_end, start, True)
 
-        if match.groups()[0] is not None: # comment
+        if match.groups()[0] is not None:  # comment
             yield HtmlDataFragment(start, end)
-        elif match.groups()[1] is not None: # <script>...</script>
+        elif match.groups()[1] is not None:  # <script>...</script>
             for e in _parse_script(match):
                 yield e
-        else: # tag
+        else:  # tag
             yield _parse_tag(match)
         prev_end = end
     textlen = len(text)
