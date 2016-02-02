@@ -8,6 +8,7 @@ multiple times.
 import re
 import hashlib
 import six
+import requests
 
 from six.moves.urllib.request import urlopen
 from copy import deepcopy
@@ -27,22 +28,15 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
     unspecified, the encoding is guessed using `w3lib.encoding.html_to_unicode`.
     `default_encoding` is used if the encoding cannot be determined.
     """
-    fh = urlopen(url)
-    info = fh.info()
-    body_str = fh.read()
-    # guess content encoding if not specified
-    if encoding is None:
-        try:
-            # Python 3.x
-            content_type_header = fh.getheader("content-type")
-        except AttributeError:
-            # Python 2.x
-            content_type_header = info.getheader("content-type")
-        encoding, body = html_to_unicode(content_type_header, body_str,
-                default_encoding=default_encoding)
-    else:
-        body = body_str.decode(encoding)
-    return HtmlPage(fh.geturl(), headers=dict(info.items()), body=body, encoding=encoding)
+    # TODO : encoding argument is deprecated we should remote it in the future
+    try:
+        url_request = requests.get(url)
+    except Exception, ex:
+        raise IOError("Error while trying request to url %s. Reason: %s" % (url, ex))
+    body = url_request.text
+    headers = url_request.headers
+    encoding = url_request.encoding
+    return HtmlPage(url_request.url, headers=dict(headers), body=body, encoding=encoding)
 
 
 def dict_to_page(jsonpage, body_key='body'):
@@ -87,6 +81,7 @@ class HtmlPage(object):
     core extraction code, but it may be used by some extractors to translate
     entities or encoding urls.
     """
+
     def __init__(self, url=None, headers=None, body=None, page_id=None, encoding='utf-8'):
         assert isinstance(body, six.text_type), "unicode expected, got: %s" % type(body).__name__
         self.headers = headers or {}
@@ -119,15 +114,18 @@ class TextPage(HtmlPage):
     """An HtmlPage with one unique HtmlDataFragment, needed to have a
     convenient text with same interface as html page but avoiding unnecesary
     reparsing"""
+
     def _set_body(self, text):
         self._body = text
         self.parsed_body = [HtmlDataFragment(0, len(self._body), True)]
+
     body = property(lambda x: x._body, _set_body, doc="raw text for the page")
 
 
 class HtmlPageRegion(six.text_type):
     """A Region of an HtmlPage that has been extracted
     """
+
     def __new__(cls, htmlpage, data):
         return six.text_type.__new__(cls, data)
 
@@ -149,6 +147,7 @@ class HtmlPageParsedRegion(HtmlPageRegion):
     This has a parsed_fragments property that contains the parsed html
     fragments contained within this region
     """
+
     def __new__(cls, htmlpage, start_index, end_index):
         text = htmlpage.body
         if text:
@@ -182,10 +181,10 @@ class HtmlPageParsedRegion(HtmlPageRegion):
     def text_content(self):
         """Text content of this parsed region"""
         text_all = u" ".join(self.htmlpage.body[_element.start:_element.end] \
-                for _element in self.parsed_fragments if \
-                not isinstance(_element, HtmlTag) and _element.is_text_content)
+                             for _element in self.parsed_fragments if \
+                             not isinstance(_element, HtmlTag) and _element.is_text_content)
         return TextPage(self.htmlpage.url, self.htmlpage.headers, \
-                text_all, encoding=self.htmlpage.encoding).subregion()
+                        text_all, encoding=self.htmlpage.encoding).subregion()
 
 
 class HtmlTagType(object):
@@ -219,8 +218,11 @@ class HtmlTag(HtmlDataFragment):
         self.attributes = attributes
 
     def __str__(self):
-        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted\
-                (["%s: %s" % (k, repr(v)) for k, v in self.attributes.items()])), self.tag_type, self.start, self.end)
+        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted \
+                                                                                                 (["%s: %s" % (
+                                                                                                 k, repr(v)) for k, v in
+                                                                                                   self.attributes.items()])),
+                                                                         self.tag_type, self.start, self.end)
 
     def __repr__(self):
         return str(self)
@@ -255,12 +257,12 @@ def parse_html(text):
         if start > prev_end:
             yield HtmlDataFragment(prev_end, start, True)
 
-        if match.groups()[0] is not None: # comment
+        if match.groups()[0] is not None:  # comment
             yield HtmlDataFragment(start, end)
-        elif match.groups()[1] is not None: # <script>...</script>
+        elif match.groups()[1] is not None:  # <script>...</script>
             for e in _parse_script(match):
                 yield e
-        else: # tag
+        else:  # tag
             yield _parse_tag(match)
         prev_end = end
     textlen = len(text)
