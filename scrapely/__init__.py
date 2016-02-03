@@ -32,7 +32,7 @@ class Scraper(object):
         self._templates.append(template)
         self._ex = None
 
-    def train_from_htmlpage(self, htmlpage, data):
+    def train_from_htmlpage(self, htmlpage, data, weights=None, allow_html_dict=None):
         assert data, "Cannot train with empty data"
         tm = TemplateMaker(htmlpage)
         for field, values in data.items():
@@ -41,12 +41,14 @@ class Scraper(object):
                 values = [values]
             for value in values:
                 value = str_to_unicode(value, htmlpage.encoding)
-                tm.annotate(field, best_match(value))
+                weight = weights[field] if weights else 1.0
+                allow_html = allow_html_dict[field] if allow_html_dict else True
+                tm.annotate(field, best_match(value), weight=weight, allow_html=allow_html)
         self.add_template(tm.get_template())
 
-    def train(self, url, data, encoding=None):
+    def train(self, url, data, encoding=None, weights=None, allow_html_dict=None):
         page = url_to_page(url, encoding)
-        self.train_from_htmlpage(page, data)
+        self.train_from_htmlpage(page, data, weights, allow_html_dict)
 
     def scrape(self, url, encoding=None):
         page = url_to_page(url, encoding)

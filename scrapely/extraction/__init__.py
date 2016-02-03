@@ -125,14 +125,18 @@ class InstanceBasedLearningExtractor(object):
             weight = 0.0
             # Getting all annotations weights in the template.
             annotations_weights = {}
+            annotations_allow_html = {}
             for annotation in extraction_tree.template.annotations:
                 for tag_attribute in annotation.tag_attributes:
                     if tag_attribute[0] == 'weight':
                         annotations_weights[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
-                        break
+                    elif tag_attribute[0] == 'allow_html':
+                        annotations_allow_html[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
             # Sum the weights of extracted values.
-            for key, value in correctly_extracted[0].items():
-                weight += annotations_weights.get(key, 1.0)
+            for field, value in correctly_extracted[0].items():
+                allow_html = annotations_allow_html.get(field, True)
+                if not (self._is_contain_html(value[0]) and not allow_html):
+                    weight += annotations_weights.get(field, 1.0)
 
             if weight > max_weight:
                 max_weight = weight
@@ -149,6 +153,16 @@ class InstanceBasedLearningExtractor(object):
     def _filter_not_none(items):
         return [d for d in items if d is not None]
 
+    @staticmethod
+    def _is_contain_html(value):
+        """
+        Check if text contain html
+        :param text: string -- text
+        :return: boolean
+        """
+        from bs4 import BeautifulSoup
+        result = bool(BeautifulSoup(value, "html.parser").find())
+        return result
 
 def _annotation_count(template):
     return len(template.annotations)
