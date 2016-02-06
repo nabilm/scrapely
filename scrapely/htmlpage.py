@@ -218,11 +218,11 @@ class HtmlTag(HtmlDataFragment):
         self.attributes = attributes
 
     def __str__(self):
-        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted \
-                                                                                                 (["%s: %s" % (
-                                                                                                 k, repr(v)) for k, v in
-                                                                                                   self.attributes.items()])),
-                                                                         self.tag_type, self.start, self.end)
+        return "<HtmlTag tag='%s' attributes={%s} type='%d' [%s:%s]>" % (self.tag, ', '.join(sorted(["%s: %s" % (
+                                                                                             k, repr(v)) for
+                                                                                           k, v in
+                                                                                           self.attributes.items()])),
+                                                                 self.tag_type, self.start, self.end)
 
     def __repr__(self):
         return str(self)
