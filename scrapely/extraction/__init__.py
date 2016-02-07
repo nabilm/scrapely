@@ -17,7 +17,7 @@ Main departures from the original algorithm:
       suffix.
 """
 from operator import itemgetter
-from scrapely.extractors import _is_contain_html
+from scrapely.extractors import is_contain_html
 from .pageparsing import parse_template, parse_extraction_page
 from .pageobjects import TokenDict
 from .regionextract import (BasicTypeExtractor, TraceExtractor, RepeatedDataExtractor,
@@ -136,7 +136,7 @@ class InstanceBasedLearningExtractor(object):
             # Sum the weights of extracted values.
             for field, value in correctly_extracted[0].items():
                 allow_html = annotations_allow_html.get(field, True)
-                if not (_is_contain_html(value[0]) and not allow_html):
+                if not (is_contain_html(value[0]) and not allow_html):
                     weight += annotations_weights.get(field, 1.0)
 
             if weight > max_weight:

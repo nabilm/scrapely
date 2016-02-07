@@ -54,7 +54,7 @@ _TAGS_TO_REPLACE = {
 _TAGS_TO_PURGE = ('script', 'img', 'input')
 
 
-def _is_contain_html(value):
+def is_contain_html(value):
     """
     Check if text contain html
     :param text: string -- text
