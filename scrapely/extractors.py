@@ -54,6 +54,17 @@ _TAGS_TO_REPLACE = {
 _TAGS_TO_PURGE = ('script', 'img', 'input')
 
 
+def _is_contain_html(value):
+    """
+    Check if text contain html
+    :param text: string -- text
+    :return: boolean
+    """
+    from bs4 import BeautifulSoup
+    result = bool(BeautifulSoup(value, "html.parser").find())
+    return result
+
+
 def htmlregion(text):
     """convenience function to make an html region from text.
     This is useful for testing
