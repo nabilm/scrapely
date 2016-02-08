@@ -27,6 +27,7 @@ _IMAGES = (
 _IMAGES_TYPES = '|'.join(_IMAGES)
 _CSS_IMAGERE = re.compile("background(?:-image)?\s*:\s*url\((.*?)\)", re.I)
 _BASE_PATH_RE = "/?(?:[^/]+/)*(?:.+%s)"
+_OUTER_TEXT_RE = "<.+>(.|\s)*?|<[^>]+>"
 _IMAGE_PATH_RE = re.compile(_BASE_PATH_RE % '\.(?:%s)' % _IMAGES_TYPES, re.I)
 _GENERIC_PATH_RE = re.compile(_BASE_PATH_RE % '', re.I)
 _WS = re.compile("\s+", re.U)
@@ -113,6 +114,15 @@ def text(region):
     text = remove_entities(region.text_content, encoding=region.htmlpage.encoding)
     return _WS.sub(u' ', text).strip()
 
+def outer_text(html):
+    """Getting only the text in outer Tag and removing excessive whitespace,
+
+    For example:
+    >>> t = lambda s: outer_text(s)
+    >>> t(u'<div> <div id="2"> this is the text i do NOT want </div> this is the text i want here </div>')
+    u'this is the text i want here'
+    """
+    return re.sub(_OUTER_TEXT_RE, '', html).strip()
 
 def safehtml(region, allowed_tags=_TAGS_TO_KEEP, replace_tags=_TAGS_TO_REPLACE,
     tags_to_purge=_TAGS_TO_PURGE):
