@@ -135,6 +135,7 @@ class InstanceBasedLearningExtractor(object):
                         annotations_allow_html[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
             # Sum the weights of extracted values.
             for field, value in correctly_extracted[0].items():
+                extracted_text = ''
                 allow_html = annotations_allow_html.get(field, True)
                 if is_contain_html(value[0]) and not allow_html:
                     extracted_text = outer_text(value[0])
