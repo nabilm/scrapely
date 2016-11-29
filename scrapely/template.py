@@ -76,8 +76,9 @@ class TemplateMaker(object):
         return anlist
 
     def annotate_fragment(self, index, field, weight=1, allow_html=True):
+        is_tag_closed = False
         for f in self.htmlpage.parsed_body[index::-1]:
-            if isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.OPEN_TAG:
+            if isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.OPEN_TAG and not is_tag_closed:
                 if 'data-scrapy-annotate' in f.attributes:
                     fstr = self.htmlpage.fragment_data(f)
                     raise FragmentAlreadyAnnotated("Fragment already annotated: %s" % fstr)
@@ -86,6 +87,10 @@ class TemplateMaker(object):
                 p = self.htmlpage
                 p.body = p.body[:f.end-1] + a + p.body[f.end-1:]
                 return True
+            elif isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.OPEN_TAG and is_tag_closed:
+                is_tag_closed = False
+            elif isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.CLOSE_TAG:
+                is_tag_closed = True
         return False
 
     def get_template(self):
