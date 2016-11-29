@@ -1,3 +1,5 @@
 numpy
 w3lib
 six
+beautifulsoup4
+requests
