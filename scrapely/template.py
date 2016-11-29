@@ -97,7 +97,10 @@ def best_match(text):
     """Function to use in TemplateMaker.annotate()"""
     def func(fragment, page):
         fdata = page.fragment_data(fragment).strip()
-        if text in fdata:
+        if text in fdata.replace('&#160;', ' ').replace('\n', ' ').replace('&#8217;', "'").replace('&amp;', '&'):
+            return float(len(text)) / len(fdata) - (1e-6 * fragment.start)
+        elif (text.replace(' ', '').replace('\t', ' ') in fdata.replace('&#160;', ' ').replace('\n', ' ').replace('&#8217;', "'").
+                replace('&amp;', '&').replace(' ', '')):
             return float(len(text)) / len(fdata) - (1e-6 * fragment.start)
         else:
             return 0.0

@@ -39,6 +39,16 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
     return HtmlPage(url_request.url, headers=dict(headers), body=body, encoding=encoding)
 
 
+def xml_to_page(url, xml, encoding='utf-8'):
+    """
+    Transform XML passed to page
+    :param xml:
+    :param encoding:
+    :return:
+    """
+    return HtmlPage(url, body=xml, encoding=encoding)
+
+
 def dict_to_page(jsonpage, body_key='body'):
     """Create an HtmlPage object from a dict object.
 
