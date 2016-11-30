@@ -41,10 +41,11 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
 
 def xml_to_page(url, xml, encoding='utf-8'):
     """
-    Transform XML passed to page
-    :param xml:
-    :param encoding:
-    :return:
+    Create an HtmlPage from XML file given. The XML tags should be similar to the HTML tags
+    in order for Scrapely to be able to parse it and annotate it.
+    :param xml: XML body given to Scrapely for training or scraping
+    :param encoding: 'utf-8' by default but it could be otherwise
+    :return: HtmlPage instance created.
     """
     return HtmlPage(url, body=xml, encoding=encoding)
 

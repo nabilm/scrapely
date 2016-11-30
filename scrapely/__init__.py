@@ -53,7 +53,7 @@ class Scraper(object):
         elif xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
-            raise Exception('Missing XML')
+            raise Exception('Train function should be given either URL or XML.')
         self.train_from_htmlpage(page, data, weights, allow_html_dict)
 
     def scrape(self, url, html, xml=None, encoding=None):
@@ -62,7 +62,7 @@ class Scraper(object):
         elif xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
-            raise Exception('Missing XML')
+            raise Exception('Scrape function should be given either URL or XML.')
         return self.scrape_page(page)
 
     def scrape_page(self, page):
