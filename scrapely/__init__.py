@@ -1,5 +1,4 @@
-# coding=utf-8
-import urllib
+# -*- coding: utf-8 -*-
 import json
 
 from w3lib.util import str_to_unicode

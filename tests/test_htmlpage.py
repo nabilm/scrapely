@@ -1,7 +1,7 @@
 """
 htmlpage.py tests
 """
-import os, copy
+import copy
 from unittest import TestCase
 
 from scrapely.htmlpage import parse_html, HtmlTag, HtmlDataFragment, HtmlPage
@@ -134,6 +134,11 @@ class TestParseHtml(TestCase):
         """Test case when attributes are not separated by space (still recognizable because of quotes)"""
         parsed = [_decode_element(d) for d in PARSED9]
         self._test_sample(PAGE9, parsed)
+
+    def test_malformed3(self):
+        """Test case where attributes are repeated (should take first attribute, accoring to spec)"""
+        parsed = [_decode_element(d) for d in PARSED10]
+        self._test_sample(PAGE10, parsed)
 
     def test_empty_subregion(self):
         htmlpage = HtmlPage(body=u"")
