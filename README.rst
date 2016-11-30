@@ -2,17 +2,25 @@
 Scrapely
 ========
 
-.. image:: https://travis-ci.org/scrapy/scrapely.svg?branch=master
+.. image:: https://api.travis-ci.org/scrapy/scrapely.svg?branch=master
     :target: https://travis-ci.org/scrapy/scrapely
 
 Scrapely is a library for extracting structured data from HTML pages. Given
 some example web pages and the data to be extracted, scrapely constructs a
 parser for all similar pages.
 
+Overview
+========
+
+Scrapinghub wrote a nice `blog post`_ explaining how scrapely works and how it's used in Portia_.
+
+.. _blog post: https://blog.scrapinghub.com/2016/07/07/scrapely-the-brains-behind-portia-spiders/
+.. _Portia: http://portia.readthedocs.io/
+
 Installation
 ============
 
-Scrapely works in Python 2.6, 2.7 or 3.3+.
+Scrapely works in Python 2.7 or 3.3+.
 It requires numpy and w3lib Python packages.
 
 To install scrapely on any platform use::

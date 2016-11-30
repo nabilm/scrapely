@@ -1,5 +1,4 @@
-# coding=utf-8
-import urllib
+# -*- coding: utf-8 -*-
 import json
 
 from w3lib.util import str_to_unicode
@@ -47,22 +46,18 @@ class Scraper(object):
                 tm.annotate(field, best_match(value), weight=weight, allow_html=allow_html)
         self.add_template(tm.get_template())
 
-    def train(self, url, data, html, xml=None, encoding=None, weights=None, allow_html_dict=None):
-        if html:
-            page = url_to_page(url, encoding)
-        elif xml:
+    def train(self, url, data, xml=None, encoding=None, weights=None, allow_html_dict=None):
+        if xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
-            raise Exception('Train function should be given either URL or XML.')
+            page = url_to_page(url, encoding)
         self.train_from_htmlpage(page, data, weights, allow_html_dict)
 
-    def scrape(self, url, html, xml=None, encoding=None):
-        if html:
-            page = url_to_page(url, encoding)
-        elif xml:
+    def scrape(self, url, xml=None, encoding=None):
+        if xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
-            raise Exception('Scrape function should be given either URL or XML.')
+            page = url_to_page(url, encoding)
         return self.scrape_page(page)
 
     def scrape_page(self, page):

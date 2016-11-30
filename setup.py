@@ -1,5 +1,18 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
+from setuptools.extension import Extension
+from Cython.Build import cythonize
+import numpy as np
+
+extensions = [
+    Extension("scrapely._htmlpage",
+              ["scrapely/_htmlpage.pyx"],
+              include_dirs=[np.get_include()]),
+    Extension("scrapely.extraction._similarity",
+              ["scrapely/extraction/_similarity.pyx"],
+              include_dirs=[np.get_include()]),
+]
+
 
 setup(
     name='scrapely',
@@ -18,7 +31,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
@@ -26,5 +38,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Text Processing :: Markup :: HTML',
     ],
-    install_requires=['numpy', 'w3lib'],
+    install_requires=['numpy', 'w3lib', 'six', 'cython'],
+    ext_modules=cythonize(extensions),
 )
