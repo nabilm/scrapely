@@ -12,6 +12,9 @@ from copy import deepcopy
 import requests
 import six
 
+# TODO: The next two lines for development only, remove it before production.
+import pyximport
+pyximport.install()
 from . import _htmlpage
 
 parse_html = _htmlpage.parse_html
