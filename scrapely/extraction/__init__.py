@@ -127,12 +127,15 @@ class InstanceBasedLearningExtractor(object):
             # Getting all annotations weights in the template.
             annotations_weights = {}
             annotations_allow_html = {}
+            annotations_required_fields = {}
             for annotation in extraction_tree.template.annotations:
                 for tag_attribute in annotation.tag_attributes:
                     if tag_attribute[0] == 'weight':
                         annotations_weights[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
-                    elif tag_attribute[0] == 'allow_html':
-                        annotations_allow_html[str(annotation.surrounds_attribute)] = float(tag_attribute[1])
+                    elif tag_attribute[0] == 'is_allow_html':
+                        annotations_allow_html[str(annotation.surrounds_attribute)] = bool(tag_attribute[1])
+                    elif tag_attribute[0] == 'is_required':
+                        annotations_required_fields[str(annotation.surrounds_attribute)] = bool(tag_attribute[1])
             # Sum the weights of extracted values.
             for field, value in correctly_extracted[0].items():
                 extracted_text = ''
@@ -146,7 +149,11 @@ class InstanceBasedLearningExtractor(object):
                 if extracted_text or (not (is_contain_html(value[0]) and not allow_html)):
                     weight += annotations_weights.get(field, 1.0)
 
-            if weight > max_weight:
+            # Getting required fields names.
+            required_fields = [field for field, is_required in annotations_required_fields.items() if is_required]
+            # Checking if all required fields are extracted and checking weights.
+            missing_required_fields = set(required_fields) - set(correctly_extracted[0].keys())
+            if weight > max_weight and not missing_required_fields:
                 max_weight = weight
                 max_extracted_value = correctly_extracted[0]
                 correctly_extracted_template = extraction_tree.template

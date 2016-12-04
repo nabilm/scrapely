@@ -76,7 +76,9 @@ PARSED = [
 {'attributes': {'data-scrapy-annotate': '{&quot;variant&quot;: &quot;0&quot;, &quot;annotations&quot;: {&quot;content&quot;: &quot;features&quot;}}', 'class': None}, 'tag': 'p', 'end': 1074, 'start': 931, 'tag_type': 1},
 {'start': 1074, 'end': 1084},
 {'attributes': {}, 'tag': 'p', 'end': 1088, 'start': 1084, 'tag_type': 2},
-{'start': 1088, 'end': 1109},
+{'start': 1088, 'end': 1089},
+{'start': 1089, 'end': 1108, 'is_text_content': False},
+{'start': 1108, 'end': 1109},
 {'attributes': {'data-scrapy-replacement': 'select', 'class': 'product'}, 'tag': 'ul', 'end': 1162, 'start': 1109, 'tag_type': 1},
 {'start': 1162, 'end': 1163},
 {'attributes': {'data-scrapy-replacement': 'option'}, 'tag': 'li', 'end': 1200, 'start': 1163, 'tag_type': 1},
@@ -275,3 +277,20 @@ PARSED9 = [
     {'attributes' : {}, 'end': 110, 'start': 103, 'tag': 'body', 'tag_type': 2},
     {'attributes' : {}, 'end': 117, 'start': 110, 'tag': 'html', 'tag_type': 2},
 ]
+
+PAGE10 = u"""\
+<html>\
+<body>\
+<img src='/images/9589.jpg' width='230' height='150' src='/IGNORED.jpg'>\
+</body>\
+</html>\
+"""
+
+PARSED10 = [
+    {"attributes": {}, "end": 6, "start": 0, "tag": "html", "tag_type": 1},
+    {"attributes": {}, "end": 12, "start": 6, "tag": "body", "tag_type": 1},
+    {"attributes": {"height": "150", "src": "/images/9589.jpg", "width": "230"}, "end": 84, "start": 12, "tag": "img", "tag_type": 1},
+    {"attributes": {}, "end": 91, "start": 84, "tag": "body", "tag_type": 2},
+    {"attributes": {}, "end": 98, "start": 91, "tag": "html", "tag_type": 2}
+]
+
