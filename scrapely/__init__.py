@@ -32,7 +32,7 @@ class Scraper(object):
         self._templates.append(template)
         self._ex = None
 
-    def train_from_htmlpage(self, htmlpage, data, weights=None, allow_html_dict=None):
+    def train_from_htmlpage(self, htmlpage, data, weights=None, required=None, allow_html=None):
         assert data, "Cannot train with empty data"
         tm = TemplateMaker(htmlpage)
         for field, values in data.items():
@@ -41,17 +41,22 @@ class Scraper(object):
                 values = [values]
             for value in values:
                 value = str_to_unicode(value, htmlpage.encoding)
-                weight = weights[field] if weights else 1.0
-                allow_html = allow_html_dict[field] if allow_html_dict else True
-                tm.annotate(field, best_match(value), weight=weight, allow_html=allow_html)
+                # Checking if the field in weights dict to take the value.
+                weight = weights[field] if weights and field in weights else 1.0
+                # Checking if the field in allow_html dict to take the value.
+                is_allow_html = allow_html[field] if allow_html and field in allow_html else True
+                # Checking if the field in required list to take the value.
+                is_required = required[field] if required and field in required else False
+                tm.annotate(field, best_match(value), weight=weight, is_required=is_required,
+                            is_allow_html=is_allow_html)
         self.add_template(tm.get_template())
 
-    def train(self, url, data, xml=None, encoding=None, weights=None, allow_html_dict=None):
+    def train(self, url, data, xml=None, encoding=None, weights=None, required=None, allow_html=None):
         if xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
             page = url_to_page(url, encoding)
-        self.train_from_htmlpage(page, data, weights, allow_html_dict)
+        self.train_from_htmlpage(page, data, weights, required, allow_html)
 
     def scrape(self, url, xml=None, encoding=None):
         if xml:
