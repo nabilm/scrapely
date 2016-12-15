@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 import copy
 import json
-
+from HTMLParser import HTMLParser
 from scrapely.htmlpage import HtmlTag, HtmlTagType
 
 
@@ -21,7 +22,7 @@ class TemplateMaker(object):
     def __init__(self, htmlpage):
         self.htmlpage = copy.copy(htmlpage)
 
-    def annotate(self, field, score_func, best_match=True, weight=1, allow_html=True):
+    def annotate(self, field, score_func, best_match=True, weight=1.0, is_required=False, is_allow_html=True):
         """Annotate a field.
 
         ``score_func`` is a callable that receives two arguments: (fragment,
@@ -41,7 +42,7 @@ class TemplateMaker(object):
         if best_match:
             del indexes[1:]
         for i in indexes:
-            self.annotate_fragment(i, field, weight, allow_html)
+            self.annotate_fragment(i, field, weight, is_required, is_allow_html)
 
     def select(self, score_func):
         """Return the indexes of fragment where score_func returns a positive
@@ -75,14 +76,15 @@ class TemplateMaker(object):
                     anlist.append((an, i))
         return anlist
 
-    def annotate_fragment(self, index, field, weight=1, allow_html=True):
+    def annotate_fragment(self, index, field, weight=1.0, is_required=False, is_allow_html=True):
         is_tag_closed = False
         for f in self.htmlpage.parsed_body[index::-1]:
             if isinstance(f, HtmlTag) and f.tag_type == HtmlTagType.OPEN_TAG and not is_tag_closed:
                 if 'data-scrapy-annotate' in f.attributes:
                     fstr = self.htmlpage.fragment_data(f)
                     raise FragmentAlreadyAnnotated("Fragment already annotated: %s" % fstr)
-                d = {'annotations': {'content': field, 'weight': weight, 'allow_html': allow_html}}
+                d = {'annotations': {'content': field, 'weight': weight, 'is_required': is_required,
+                                     'is_allow_html': is_allow_html}}
                 a = ' data-scrapy-annotate="%s"' % json.dumps(d).replace('"', '&quot;')
                 p = self.htmlpage
                 p.body = p.body[:f.end-1] + a + p.body[f.end-1:]
@@ -102,12 +104,10 @@ def best_match(text):
     """Function to use in TemplateMaker.annotate()"""
     def func(fragment, page):
         fdata = page.fragment_data(fragment).strip()
-        # TODO: replace functions should be replaced with either regex or dict of possible
-        # replacements in order to make the code readable.
-        if text in fdata.replace('&#160;', ' ').replace('\n', ' ').replace('&#8217;', "'").replace('&amp;', '&'):
-            return float(len(text)) / len(fdata) - (1e-6 * fragment.start)
-        elif (text.replace(' ', '').replace('\t', ' ') in fdata.replace('&#160;', ' ').replace('\n', ' ').replace('&#8217;', "'").
-                replace('&amp;', '&').replace(' ', '')):
+        # Add converting unicode HTML to unicode ('unescaped') with htmlparser
+        # To avoid escaping HTML entities appears in scraped fragments
+        htmlparser = HTMLParser()
+        if text in htmlparser.unescape(fdata):
             return float(len(text)) / len(fdata) - (1e-6 * fragment.start)
         else:
             return 0.0

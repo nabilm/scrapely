@@ -62,3 +62,14 @@ docs/_build/
 # PyBuilder
 target/
 
+*.pyc
+*.c
+*.so
+.tox
+build
+dist
+scrapely.egg-info
+
+# coverage reports
+.coverage
+.coverage.*
