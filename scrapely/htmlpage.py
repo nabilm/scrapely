@@ -57,7 +57,7 @@ def scrapy_response_to_page(scrapy_response):
     :param scrapy_response: scrapy.http.Response object
     :return: HtmlPage instance created.
     """
-    body = scrapy_response.body_as_unicode
+    body = unicode(scrapy_response.body,"utf-8")
     headers = scrapy_response.headers
     encoding = scrapy_response.encoding
     return HtmlPage(scrapy_response.url, headers=dict(headers), body=body, encoding=encoding)
