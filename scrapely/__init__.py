@@ -3,7 +3,7 @@ import json
 
 from w3lib.util import str_to_unicode
 
-from scrapely.htmlpage import HtmlPage, page_to_dict, url_to_page, xml_to_page
+from scrapely.htmlpage import HtmlPage, page_to_dict, url_to_page, xml_to_page, scrapy_response_to_page
 from scrapely.template import TemplateMaker, best_match
 from scrapely.extraction import InstanceBasedLearningExtractor
 
@@ -53,8 +53,10 @@ class Scraper(object):
             page = url_to_page(url, encoding)
         self.train_from_htmlpage(page, data, weights, allow_html_dict)
 
-    def scrape(self, url, xml=None, encoding=None):
-        if xml:
+    def scrape(self, url, xml=None, scrapy_response=None, encoding=None):
+        if scrapy_response:
+            page = scrapy_response_to_page(scrapy_response)
+        elif xml:
             page = xml_to_page(url, xml, encoding='utf-8')
         else:
             page = url_to_page(url, encoding)

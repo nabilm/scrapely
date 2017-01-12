@@ -49,6 +49,20 @@ def url_to_page(url, encoding=None, default_encoding='utf-8'):
     return HtmlPage(url_request.url, headers=dict(headers), body=body, encoding=encoding)
 
 
+def scrapy_response_to_page(scrapy_response):
+    """
+    Create an HtmlPage from Scrapy response given. This should only used when integrating with
+    scrapy projects. Motivation for this, when you're manipulating the request headers from a
+    scrapy project, the response may be different form the one obtained from url_to_page funtion.
+    :param scrapy_response: scrapy.http.Response object
+    :return: HtmlPage instance created.
+    """
+    body = unicode(scrapy_response.body,"utf-8")
+    headers = scrapy_response.headers
+    encoding = scrapy_response.encoding
+    return HtmlPage(scrapy_response.url, headers=dict(headers), body=body, encoding=encoding)
+
+
 def xml_to_page(url, xml, encoding='utf-8'):
     """
     Create an HtmlPage from XML file given. The XML tags should be similar to the HTML tags
